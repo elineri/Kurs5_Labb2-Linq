@@ -31,12 +31,14 @@ namespace Labb2_Linq_2
         {
             using SchoolDbContext Context = new SchoolDbContext();
 
+            // TODO: Group by student
             var MathTeachers = from s in Context.Students
                                join c in Context.Courses on s.CourseId equals c.Id
                                join csc in Context.CourseSubjects on c.Id equals csc.CourseId
                                join su in Context.Subjects on csc.SubjectId equals su.Id
                                join st in Context.SubjectTeachers on su.Id equals st.SubjectId
                                join t in Context.Teachers on st.TeacherId equals t.Id
+                               orderby s.FirstName
                                select new 
                                { 
                                    student = s.FirstName + " " + s.LastName,
@@ -60,20 +62,19 @@ namespace Labb2_Linq_2
             bool SC = (from sub in Context.Subjects
                      select sub.SubjectName).ToList().Contains("Programming1");
 
-            Console.WriteLine($" Subjects contains Programming1 = {SC}");
+            Console.WriteLine($"  Subjects contains Programming1 = {SC}");
         }
 
         public static void UpdateSubject()
         {
             using SchoolDbContext Context = new SchoolDbContext();
 
-            var S = (from s in Context.Subjects
-                     where s.SubjectName == "Programming2"
-                     select s).ToList();
-
-            foreach (var item in S)
+            var test2 = Context.Subjects.SingleOrDefault(x => x.SubjectName == "Programming2");
+            if (test2 != null)
             {
-                item.SubjectName = "OOP";
+                test2.SubjectName = "OOP";
+                Context.SaveChanges();
+                Console.WriteLine("  Subject 'Programming2' has been updated to 'OOP'");
             }
         }
 
@@ -81,32 +82,17 @@ namespace Labb2_Linq_2
         {
             using SchoolDbContext Context = new SchoolDbContext();
 
-            var stu = from s in Context.Students
-                      orderby s.Id
-                      select s;
+            var TeacherSub = (from t in Context.Teachers
+                              join st in Context.SubjectTeachers on t.Id equals st.TeacherId
+                              join su in Context.Subjects on st.SubjectId equals su.Id
+                              where st.TeacherId == 9
+                              select new { st, teacher = t.FirstName + " " + t.LastName, su }).ToList();
 
-            foreach (var item in stu)
+            foreach (var teacher in TeacherSub)
             {
-                Console.WriteLine($"{item.Id}\t {item.FirstName} {item.LastName}");
-            }
-
-            Console.Write("  Select student ID: ");
-            int stuOption = Int32.Parse(Console.ReadLine());
-
-            var Teachers = from s in Context.Students
-                           join c in Context.Courses on s.CourseId equals c.Id
-                           join csc in Context.CourseSubjects on c.Id equals csc.CourseId
-                           join su in Context.Subjects on csc.SubjectId equals su.Id
-                           join st in Context.SubjectTeachers on su.Id equals st.SubjectId
-                           join t in Context.Teachers on st.TeacherId equals t.Id
-                           where s.Id == stuOption && t.FirstName == "Göran" && t.LastName == "Svensson"
-                           select new { st};
-
-            Console.Clear();
-
-            foreach (var teacher in Teachers)
-            {
-                teacher.st.Id = 1;
+                teacher.st.TeacherId = 2;
+                Context.SaveChanges();
+                Console.WriteLine($"  Teacher updated for subject {teacher.su.SubjectName}");
             }
         }
 
@@ -123,7 +109,7 @@ namespace Labb2_Linq_2
             foreach (var item in test)
             {
 
-                Console.WriteLine($"{item.subject}\t {item.teacher}");
+                Console.WriteLine($"{item.subject}, {item.teacher}");
             }
         }
     }

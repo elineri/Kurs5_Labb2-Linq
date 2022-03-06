@@ -121,20 +121,30 @@ namespace Labb2_Linq_2
             //Context.SaveChanges();
             #endregion
 
-            Console.WriteLine($"\t *** School ****");
-
             bool run = true;
 
             while (run)
             {
+                Console.WriteLine($"\t *** School ****");
+
                 Console.WriteLine($"  [1] Math teachers\n" +
                     $"  [2] Students with teachers\n" +
                     $"  [3] Subjects contains\n" +
                     $"  [4] Update subject\n" +
-                    $"  [5] Update student records with teachers\n" +
-                    $"  [6] Show all teachers");
+                    $"  [5] Update teacher\n" +
+                    $"  [6] Show all teachers\n");
                 Console.Write("  Selection: ");
-                int select = Int32.Parse(Console.ReadLine());
+                int select = 0;
+                try
+                {
+                    select = Int32.Parse(Console.ReadLine());
+
+                }
+                catch (Exception)
+                {
+
+                    Console.WriteLine("  Please enter a number");
+                }
 
                 switch (select)
                 {
@@ -152,6 +162,7 @@ namespace Labb2_Linq_2
                         break;
                     case 4:
                         Console.Clear();
+                        MenuOptions.UpdateSubject();
                         break;
                     case 5:
                         Console.Clear();
@@ -162,9 +173,12 @@ namespace Labb2_Linq_2
                         MenuOptions.GetAllTeachers();
                         break;
                     default:
+                        Console.WriteLine("  Please choose a valid number");
                         break;
                 }
+                Console.WriteLine("\n  Press any key to continue");
                 Console.ReadKey();
+                Console.Clear();
             }
         }
     }
